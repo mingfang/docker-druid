@@ -47,6 +47,17 @@ RUN wget http://apache.spinellicreations.com/incubator/kafka/kafka-0.7.2-incubat
     cd kafka-0.7.2-incubating-src && \
     ./sbt update && ./sbt package
 
+#Install R 3+
+RUN echo 'deb http://cran.rstudio.com/bin/linux/ubuntu precise/' > /etc/apt/sources.list.d/r.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
+    apt-get update
+RUN apt-get install -y r-base libcurl4-openssl-dev
+RUN echo 'options("repos"="http://cran.us.r-project.org")' > /.Rprofile
+RUN R -e "install.packages('devtools')"
+#RDruid
+RUN R -e "devtools::install_github('RDruid', 'metamx')"
+
+
 #Config
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
