@@ -56,7 +56,12 @@ RUN echo 'options("repos"="http://cran.us.r-project.org")' > /.Rprofile
 RUN R -e "install.packages('devtools')"
 #RDruid
 RUN R -e "devtools::install_github('RDruid', 'metamx')"
-
+#RStudio Server
+RUN apt-get install -y sudo gdebi-core libapparmor1
+RUN wget http://download2.rstudio.org/rstudio-server-0.97.551-amd64.deb && \
+    gdebi -n rstudio-server-0.97.551-amd64.deb && \
+    rm rstudio-server-0.97.551-amd64.deb
+RUN useradd -b /home -m -p rstudio rstudio
 
 #Config
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
