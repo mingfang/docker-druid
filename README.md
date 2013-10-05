@@ -1,6 +1,6 @@
 docker-druid
 ============
-Docker container running Master, Compute, Realtime, Broker, R, RDruid, MySql, Zookeeper, and Kafka.
+Docker container running Master, Compute, Realtime, Broker, R/RStudio-Server, RDruid, MySql, Zookeeper, and Kafka.
 
 Requirements:Docker
 
