@@ -61,7 +61,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo gdebi-core libapparmo
 RUN wget http://download2.rstudio.org/rstudio-server-0.97.551-amd64.deb && \
     gdebi -n rstudio-server-0.97.551-amd64.deb && \
     rm rstudio-server-0.97.551-amd64.deb
-RUN useradd -b /home -m -p rstudio rstudio
+RUN useradd -m rstudio && \
+    echo "rstudio:rstudio" | chpasswd
 
 #Config
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
