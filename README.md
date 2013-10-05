@@ -23,4 +23,4 @@ supervisord&
 
 You may now follow the tutorial with step 4 here http://druid.io/docs/0.5.48/Loading-Your-Data.html
 
-Login to RStudio-Server at http://localhost:49087 as user ```rstudio``` password ```rstudio```
+Login to RStudio-Server at http://localhost:49087 as user ```rstudio``` password ```rstudio```.
