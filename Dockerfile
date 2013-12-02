@@ -1,50 +1,55 @@
 FROM ubuntu
 
-RUN	echo 'deb http://archive.ubuntu.com/ubuntu precise main universe' > /etc/apt/sources.list
-RUN	echo 'deb http://archive.ubuntu.com/ubuntu precise-updates universe' >> /etc/apt/sources.list
-RUN apt-get update
+RUN echo 'deb http://archive.ubuntu.com/ubuntu precise main universe' > /etc/apt/sources.list && \
+    echo 'deb http://archive.ubuntu.com/ubuntu precise-updates universe' >> /etc/apt/sources.list && \
+    apt-get update
 
 #Prevent daemon start during install
-RUN	echo '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
+RUN dpkg-divert --local --rename --add /sbin/initctl && ln -s /bin/true /sbin/initctl
 
 #Supervisord
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor && mkdir -p /var/log/supervisor
 CMD ["/usr/bin/supervisord", "-n"]
 
 #SSHD
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server && mkdir /var/run/sshd && echo 'root:root' |chpasswd
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server &&	mkdir /var/run/sshd && \
+	echo 'root:root' |chpasswd
 
 #Utilities
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim less ntp net-tools inetutils-ping curl git
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim less net-tools inetutils-ping curl git telnet nmap socat dnsutils netcat
 
 #Install Oracle Java 7
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-software-properties && \
-    add-apt-repository ppa:webupd8team/java -y && \
+RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main' > /etc/apt/sources.list.d/java.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y oracle-java7-installer
 
 #Install Druid
-RUN curl -O http://static.druid.io/artifacts/releases/druid-services-0.5.54-bin.tar.gz && \
-    tar -zxvf druid-services-*-bin.tar.gz && \
-    rm druid-services-*-bin.tar.gz
+RUN wget http://static.druid.io/artifacts/releases/druid-services-0.6.24-bin.tar.gz && \
+    tar -zxf druid-services-*.gz && \
+    mv druid-services-0.6.24 druid-services && \
+    rm druid-services-*.gz
 
 #MySQL
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server python-mysqldb && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server && \
     sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
 
 #Zookeeper
-RUN curl http://www.motorlogy.com/apache/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz -o zookeeper-3.4.5.tar.gz && \
-    tar xzf zookeeper-3.4.5.tar.gz && \
-    cd zookeeper-3.4.5 && \
+RUN wget http://www.motorlogy.com/apache/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz && \
+    tar xzf zookeeper-*.tar.gz && \
+    rm zookeeper-*.tar.gz && \
+    mv zookeeper-3.4.5 zookeeper && \
+    cd zookeeper && \
     cp conf/zoo_sample.cfg conf/zoo.cfg && \
-    rm /zookeeper-3.4.5.tar.gz
+    rm -rf docs src
 
 #Kafka
-RUN wget http://apache.spinellicreations.com/incubator/kafka/kafka-0.7.2-incubating/kafka-0.7.2-incubating-src.tgz && \
-    tar -xvzf kafka-0.7.2-incubating-src.tgz && \
-    rm kafka-0.7.2-incubating-src.tgz && \
-    cd kafka-0.7.2-incubating-src && \
+RUN wget http://archive.apache.org/dist/kafka/old_releases/kafka-0.7.2-incubating/kafka-0.7.2-incubating-src.tgz && \
+    tar -xvzf kafka-*.tgz && \
+    rm kafka-*.tgz && \
+    mv kafka-0.7.2-incubating-src kafka && \
+    cd kafka && \
     ./sbt update && ./sbt package
 
 #Install R 3+
@@ -64,7 +69,11 @@ RUN wget http://download2.rstudio.org/rstudio-server-0.97.551-amd64.deb && \
 RUN useradd -m rstudio && \
     echo "rstudio:rstudio" | chpasswd
 
+
 #Config
+
+#Realtime ZK config
+RUN echo '#zk\ndruid.zk.service.host=localhost\ndruid.server.maxSize=300000000000\ndruid.zk.paths.base=/druid' >> /druid-services/config/realtime/runtime.properties
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #Init MySql
@@ -73,6 +82,4 @@ RUN mysqld & sleep 3 && \
     mysql < mysql.ddl && \
     mysqladmin shutdown
 
-#Realtime ZK config
-RUN echo '#zk\ndruid.zk.service.host=localhost\ndruid.server.maxSize=300000000000\ndruid.zk.paths.base=/druid' >> /druid-services-0.5.54/config/realtime/runtime.properties
 

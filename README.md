@@ -1,6 +1,6 @@
 docker-druid
 ============
-Docker container running Master, Compute, Realtime, Broker, R/RStudio-Server, RDruid, MySql, Zookeeper, and Kafka.
+Docker container running Coordinator, Historical, Realtime, Broker, Overlord, R/RStudio-Server, RDruid, MySql, Zookeeper, and Kafka.
 
 Requirements:Docker
 
@@ -17,11 +17,13 @@ or
 Run Container
 =============
 ```bash
-docker run -p 49083:8083 -p 49087:8787 -t -i druid /bin/bash
+docker run -p 49083:8083 -p 49087:8787 -t -i -rm=true druid /bin/bash
+supervisord&
 ```
 or
 ```bash
 ./shell
+supervisord&
 ```
 
 Note port 49083 forwards the Druid Rest API,
@@ -32,7 +34,7 @@ Inside the container, start the entire cluster
 supervisord&
 ```
 
-You may now follow the tutorial with step 4 here http://druid.io/docs/0.5.48/Loading-Your-Data.html
+You may now follow the tutorial here http://druid.io/docs/0.6.24/Tutorial:-Loading-Your-Data-Part-1.html
 
 RStudio-Server
 ==============
