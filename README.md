@@ -32,7 +32,7 @@ Inside the container, start the entire cluster
 supervisord&
 ```
 
-You may now follow the tutorial here http://druid.io/docs/0.6.24/Tutorial:-Loading-Your-Data-Part-1.html
+You may now follow the tutorial here http://druid.io/docs/0.6.25/Tutorial:-Loading-Your-Data-Part-1.html
 
 RStudio-Server
 ==============
