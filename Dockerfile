@@ -26,9 +26,9 @@ RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main' > /
     DEBIAN_FRONTEND=noninteractive apt-get install -y oracle-java7-installer
 
 #Install Druid
-RUN wget http://static.druid.io/artifacts/releases/druid-services-0.6.25-bin.tar.gz && \
+RUN wget http://static.druid.io/artifacts/releases/druid-services-0.6.39-bin.tar.gz && \
     tar -zxf druid-services-*.gz && \
-    mv druid-services-0.6.25 druid-services && \
+    mv druid-services-0.6.39 /druid-services
     rm druid-services-*.gz
 
 #MySQL
@@ -78,7 +78,7 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 #Init MySql
 ADD ./mysql.ddl mysql.ddl
-RUN mysqld & sleep 3 && \
+RUN mysqld_safe & mysqladmin --wait=5 ping && \
     mysql < mysql.ddl && \
     mysqladmin shutdown
 
