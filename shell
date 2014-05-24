@@ -1,1 +1,1 @@
-docker run -p 49083:8083 -p 49087:8787 -t -i -rm=true druid /bin/bash
+docker run -p 8083:8083 -p 8787:8787 -t -i druid /bin/bash

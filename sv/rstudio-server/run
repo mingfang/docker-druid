@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#sv start socklog-unix || exit 1
+
+exec 2>&1
+exec /usr/lib/rstudio-server/bin/rserver --server-daemonize=0 --server-app-armor-enabled=0

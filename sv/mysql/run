@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#sv start socklog-unix || exit 1
+
+chown -R mysql:mysql /var/lib/mysql
+
+exec 2>&1
+exec /usr/bin/mysqld_safe

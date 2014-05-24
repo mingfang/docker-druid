@@ -1,0 +1,7 @@
+#!/bin/sh
+
+sv start coordinator || exit 1
+
+cd /druid-services
+exec 2>&1
+exec java -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -classpath lib/*:config/historical io.druid.cli.Main server historical

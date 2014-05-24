@@ -1,0 +1,7 @@
+#!/bin/sh
+
+#sv start socklog-unix || exit 1
+
+cd /kafka
+exec 2>&1
+exec /kafka/bin/kafka-server-start.sh config/server.properties
